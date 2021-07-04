@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const URL = 'http://localhost:3000/dogs'
+    const URL = 'http://localhost:3000/dogs/'
     const table = document.getElementById('table-body')
     const dogForm = document.getElementById('dog-form')
 
-    let tableDogName, tableDogBreed, tableDogSex, editButton, tableDog
+    let tableDogName, tableDogBreed, tableDogSex
 
     loadRegisteredDogs()
 
@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tableDogSex = tableDog.sex
             tableDogID = tableDog.id
             newRow = table.appendChild(document.createElement('tr'))
+            newRow.setAttribute('class', 'tableRows')
             newRow.setAttribute('class', 'padding center')
             newRow.innerHTML = `<td>${tableDogName}</td><td>${tableDogBreed}</td><td>${tableDogSex}</td><td><button class="editButton" id='${tableDogID}'>Edit</button></td>`
             editDogButton = document.getElementById(`${tableDogID}`)
@@ -30,6 +31,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function editDog(arg){
-        console.log(arg.id)
+        dogForm.name.value = arg.name
+        dogForm.breed.value = arg.breed
+        dogForm.sex.value = arg.sex
+        let dogId = arg.id
+        dogForm.addEventListener('submit', function(e){
+            e.preventDefault()
+            patchDog(dogId)
+        })
+
+    }
+    function patchDog(id){
+        let newName = dogForm.name.value
+        let newBreed = dogForm.breed.value
+        let newSex = dogForm.sex.value
+        let newDog = {
+            id: `${id}`,
+            name: `${newName}`,
+            breed: `${newBreed}`,
+            sex: `${newSex}`
+        }
+        let config = {
+            method: 'PATCH',
+            headers: {
+                'Accept': 'application/json',
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify(newDog)
+        }
+        fetch(URL+id, config)
+        .then(resp => resp.json())
+        .then(()=>{location.reload()
+        })
     }
 })
